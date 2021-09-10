@@ -1,0 +1,49 @@
+container instructions
+
+Have docker installed: https://docs.docker.com/engine/install/
+
+Once installed, run the following:
+
+docker network create local
+
+Then, navigate to the containers/tomcat directory and run:
+docker build -t webapp .
+
+This runs the tomcat server. We then want to back out of this directory and go to the containers/mysql directory, where we can run:
+docker build -t davidspecht/mysql:latest .
+
+This will prop up the mysql server. We can then start both of these containers by running the following commands:
+
+docker run -d --net local --name mysql -p 3306:3306 -d davidspecht/mysql:latest
+
+We want the previous command completed successfully before we run the next command:
+
+docker run -d --net local -p 80:8080 webapp
+
+These containers should be able to talk to each other through the network we set up previously.
+
+We can see if these containers are running using:
+docker ps
+
+If no containers show, we will want to run:
+docker ps -a
+
+Copy the container hash and run the following with each hash as the last argument:
+docker logs <hash>
+
+Also, we can run the following to see the logs of the webapp, if we encounter any issues:
+docker run --net local -p 80:8080 webapp
+
+the app will have to be pruned using the following commands in the tomcat directory beforehand, though:
+docker stop <hash>
+docker system prune -a
+(yes)
+docker build -t webapp .
+
+If everything goes well, we should be able to locate the webapp at the following URL:
+http://localhost/Vargo-0.0.1-SNAPSHOT/
+
+The following path will expose the API to the relations objects:
+http://localhost/Vargo-0.0.1-SNAPSHOT/api/relations/1
+
+There should be 6 relations in the database.
